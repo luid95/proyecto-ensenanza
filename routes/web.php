@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 
+use App\Http\Controllers\Web\CategoryController;
 use App\Http\Controllers\Web\CourseController;
 use App\Http\Controllers\Web\VideoController;
 use App\Http\Controllers\Web\CommentController;
@@ -25,7 +26,8 @@ Route::post('register', [AuthController::class, 'register']);
 
 // Rutas autenticadas (requiere que el usuario esté autenticado)
 Route::middleware(['auth'])->group(function () {
-    // Rutas para gestionar cursos, videos y comentarios
+    // Rutas para gestionar categories, cursos, videos y comentarios
+    Route::resource('categories', CategoryController::class);
     Route::resource('courses', CourseController::class);
     Route::resource('videos', VideoController::class);
     Route::resource('comments', CommentController::class);

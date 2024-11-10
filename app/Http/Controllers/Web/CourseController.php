@@ -69,17 +69,73 @@ class CourseController extends Controller
 
     public function store(Request $request)
     {
-        
-        // Lógica para guardar el nuevo curso
-        if (auth()->user()->isAdmin()) {
-            $course = new Course();
-            $course->title = $request->input('title');
-            $course->description = $request->input('description');
-            $course->category_id = $request->input('category_id');
-            $course->age_group = $request->input('min_age');
-            $course->save();
+        // Validar que el título del curso no esté duplicado
+        $validated = $request->validate([
+            'title' => 'required|unique:courses,title|max:255',
+            'description' => 'required',
+            'category_id' => 'required|exists:categories,id',
+            'min_age' => 'required|integer|min:5',
+        ]);
 
-            return redirect()->route('courses.index');
-        }
+        // Crear el curso si la validación pasa
+        $course = new Course();
+        $course->title = $request->title;
+        $course->description = $request->description;
+        $course->category_id = $request->category_id;
+        $course->age_group = $request->min_age;
+        $course->save();
+
+        return redirect()->route('courses.index')->with('success', 'Curso creado exitosamente.');
+    }
+
+    public function edit($id)
+    {
+        // Obtener el curso por su ID
+        $course = Course::findOrFail($id);
+
+        // Obtener todas las categorías para el selector
+        $categories = Category::all();
+
+        // Pasar el curso y las categorías a la vista
+        return view('courses.edit', compact('course', 'categories'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        // Validación de los datos del formulario
+        $request->validate([
+            'title' => 'required|string|max:255|unique:courses,title,' . $id,
+            'description' => 'nullable|string',
+            'category_id' => 'required|exists:categories,id',
+            'min_age' => 'required|string',
+        ]);
+
+        // Obtener el curso por su ID
+        $course = Course::findOrFail($id);
+
+        // Actualizar los campos del curso
+        $course->title = $request->input('title');
+        $course->description = $request->input('description');
+        $course->category_id = $request->input('category_id');
+        $course->age_group = $request->input('min_age');
+
+        // Guardar los cambios en la base de datos
+        $course->save();
+
+        // Redirigir a la vista de detalle del curso con un mensaje de éxito
+        return redirect()->route('courses.index', $course->id)
+            ->with('success', 'Curso actualizado correctamente');
+    }
+
+    public function destroy($id)
+    {
+        // Buscar el curso por su ID
+        $course = Course::findOrFail($id);
+
+        // Eliminar el curso
+        $course->delete();
+
+        // Redirigir de vuelta al listado de cursos con un mensaje de éxito
+        return redirect()->route('dashboard')->with('success', 'Curso eliminado correctamente');
     }
 }

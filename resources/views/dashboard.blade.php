@@ -4,11 +4,6 @@
 <div class="container mt-5">
     <h1 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 1.25rem;">Mis Cursos</h1>
 
-    <!-- Mostrar el botón solo para administradores -->
-    @if(auth()->user()->isAdmin())
-        <a href="{{ route('courses.create') }}" class="btn btn-success mb-3">Agregar Nuevo Curso</a>
-    @endif
-
     <!-- Formulario de búsqueda -->
     <form method="GET" action="{{ route('dashboard') }}" style="margin-bottom: 1.5rem;">
         <div style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end;"> <!-- Alineación en la misma línea -->
@@ -40,11 +35,22 @@
                 <input type="text" name="title" id="title" style="border: 1px solid #ddd; padding: 0.5rem; border-radius: 0.375rem; width: 100%;" placeholder="Buscar por nombre" value="{{ request('title') }}">
             </div>
 
-            <div style="flex: 1 1 auto;">
+            <!-- Contenedor de los botones de búsqueda y limpiar filtros -->
+            <div style="flex: 1 1 auto; display: flex; gap: 1rem;">
                 <button type="submit" style="background-color: #1D4ED8; color: white; padding: 0.5rem 1rem; border-radius: 0.375rem; transition: background-color 0.3s;" onmouseover="this.style.backgroundColor='#1E40AF'" onmouseout="this.style.backgroundColor='#1D4ED8'">Buscar</button>
+                
+                <!-- Botón Limpiar Filtros con estilo azul -->
+                <a href="{{ route('dashboard') }}" style="background-color: #1D4ED8; color: white; padding: 0.5rem 1rem; border-radius: 0.375rem; text-decoration: none; transition: background-color 0.3s; display: inline-block;" onmouseover="this.style.backgroundColor='#1E40AF'" onmouseout="this.style.backgroundColor='#1D4ED8'">Limpiar Filtros</a>
             </div>
         </div>
     </form>
+
+    <!-- Mostrar el botón solo para administradores -->
+    @if(auth()->user()->isAdmin())
+        <div style="text-align: right; margin-top: 1.5rem;">
+            <a href="{{ route('courses.create') }}" style="background-color: #1D4ED8; color: white; padding: 0.5rem 1rem; border-radius: 0.375rem; text-decoration: none; transition: background-color 0.3s;" onmouseover="this.style.backgroundColor='#1E40AF'" onmouseout="this.style.backgroundColor='#1D4ED8'">Agregar Nuevo Curso</a>
+        </div>
+    @endif
 
     <!-- Listado de cursos -->
     <div style="display: grid; grid-template-columns: repeat(1, 1fr); gap: 1.5rem; margin-top: 1.5rem;">
@@ -63,12 +69,21 @@
 
                     <div style="margin-top: 1rem;">
                         <a href="{{ route('courses.show', $course->id) }}" style="background-color: #1E3A8A; color: white; padding: 0.5rem 1rem; border-radius: 0.375rem; text-decoration: none; display: inline-block; transition: background-color 0.3s;" onmouseover="this.style.backgroundColor='#2563EB'" onmouseout="this.style.backgroundColor='#1E3A8A'">Ver detalles</a>
+
+                        <!-- Mostrar los botones de Editar y Eliminar solo para administradores -->
+                        @if(auth()->user()->isAdmin())
+                            <a href="{{ route('courses.edit', $course->id) }}" style="background-color: #f59e0b; color: white; padding: 0.5rem 1rem; border-radius: 0.375rem; text-decoration: none; margin-left: 10px; transition: background-color 0.3s;" onmouseover="this.style.backgroundColor='#d97706'" onmouseout="this.style.backgroundColor='#f59e0b'">Editar</a>
+
+                            <form action="{{ route('courses.destroy', $course->id) }}" method="POST" style="display: inline-block; margin-left: 10px;">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" style="background-color: #dc2626; color: white; padding: 0.5rem 1rem; border-radius: 0.375rem; border: none; cursor: pointer;">Eliminar</button>
+                            </form>
+                        @endif
                     </div>
                 </div>
             </div>
         @endforeach
     </div>
-
-
 </div>
 @endsection
