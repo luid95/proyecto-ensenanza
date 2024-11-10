@@ -54,11 +54,16 @@ class CourseController extends Controller
         return view('dashboard', compact('courses', 'categories'));
     }
 
-    public function show(Course $course)
+    public function show($id)
     {
-        // Obtener los videos relacionados al curso
-        $videos = $course->videos;
-        return view('courses.show', compact('course', 'videos'));
+        // Obtén el curso por su ID, carga la categoría y los videos relacionados
+        $course = Course::with(['category', 'videos'])->findOrFail($id);
+
+        // Calcula el total de minutos sumando los minutos de cada video
+        $totalMinutes = $course->videos->sum('minutes');
+
+        // Retorna la vista de detalles del curso con el total de minutos
+        return view('courses.show', compact('course', 'totalMinutes'));
     }
 
     public function create()

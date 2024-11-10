@@ -68,7 +68,11 @@
                     </div>
 
                     <div style="margin-top: 1rem;">
-                        <a href="{{ route('courses.show', $course->id) }}" style="background-color: #1E3A8A; color: white; padding: 0.5rem 1rem; border-radius: 0.375rem; text-decoration: none; display: inline-block; transition: background-color 0.3s;" onmouseover="this.style.backgroundColor='#2563EB'" onmouseout="this.style.backgroundColor='#1E3A8A'">Ver detalles</a>
+                        @if(auth()->user()->isAdmin())
+                            <a href="{{ route('courses.show', $course->id) }}" style="background-color: #1E3A8A; color: white; padding: 0.5rem 1rem; border-radius: 0.375rem; text-decoration: none; display: inline-block; transition: background-color 0.3s;" onmouseover="this.style.backgroundColor='#2563EB'" onmouseout="this.style.backgroundColor='#1E3A8A'">Ver detalles</a>
+                        @elseif( auth()->user()->isUser())
+                            <a href="{{ route('courses.show', $course->id) }}" style="background-color: #1E3A8A; color: white; padding: 0.5rem 1rem; border-radius: 0.375rem; text-decoration: none; display: inline-block; transition: background-color 0.3s;" onmouseover="this.style.backgroundColor='#2563EB'" onmouseout="this.style.backgroundColor='#1E3A8A'">Registrarse al curso</a>
+                        @endif
 
                         <!-- Mostrar los botones de Editar y Eliminar solo para administradores -->
                         @if(auth()->user()->isAdmin())

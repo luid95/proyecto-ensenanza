@@ -55,4 +55,9 @@ class User extends Authenticatable
     {
         return $this->role === 'user';
     }
+
+    public function courses()
+    {
+        return $this->belongsToMany(Course::class)->withPivot('progress', 'current_video_id')->withTimestamps();
+    }
 }

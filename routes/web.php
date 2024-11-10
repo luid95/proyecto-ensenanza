@@ -8,6 +8,8 @@ use App\Http\Controllers\Web\VideoController;
 use App\Http\Controllers\Web\CommentController;
 use App\Http\Controllers\AuthController;
 
+use App\Http\Controllers\CourseUserController;
+
 use Illuminate\Support\Facades\Route;
 
 // Ruta predeterminada (si no está autenticado, lo redirige al login)
@@ -31,6 +33,11 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('courses', CourseController::class);
     Route::resource('videos', VideoController::class);
     Route::resource('comments', CommentController::class);
+    Route::resource('courses/progress', CourseUserController::class);
+
+     // Ruta específica para crear un video en un curso con course_id
+     Route::get('courses/{course}/videos/create', [VideoController::class, 'create'])->name('videos.create');
+     Route::get('/videos/{video}', [VideoController::class, 'index'])->name('videos.view');
 });
 
 // Ruta de inicio (redirige a la vista 'home' si está autenticado)
