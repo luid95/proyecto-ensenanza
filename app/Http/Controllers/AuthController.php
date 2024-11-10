@@ -25,7 +25,7 @@ class AuthController extends Controller
 
         if (Auth::attempt($request->only('email', 'password'))) {
             // Si la autenticación tiene éxito, redirige a la página de inicio
-            return redirect()->route('home');
+            return redirect()->route('dashboard');
         }
 
         // Si la autenticación falla, vuelve al formulario con un mensaje de error
@@ -33,9 +33,12 @@ class AuthController extends Controller
     }
 
     // Manejar el cierre de sesión
-    public function logout()
+    public function logout(Request $request)
     {
         Auth::logout();
-        return redirect()->route('login');
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect('/login');
     }
 }
