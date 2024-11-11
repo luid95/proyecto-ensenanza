@@ -60,4 +60,9 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Course::class)->withPivot('progress', 'current_video_id')->withTimestamps();
     }
+
+    public function likedVideos()
+    {
+        return $this->belongsToMany(Video::class, 'likes');
+    }
 }

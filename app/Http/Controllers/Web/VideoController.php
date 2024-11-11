@@ -127,4 +127,18 @@ class VideoController extends Controller
         return back()->with('message', 'Comentario enviado y esperando aprobación');
     }
 
+    public function toggleLike(Request $request, $videoId)
+    {
+        $video = Video::findOrFail($videoId);
+        $user = $request->user();
+
+        if ($user->likedVideos()->where('video_id', $video->id)->exists()) {
+            $user->likedVideos()->detach($video->id);
+            return response()->json(['message' => 'Like removido.']);
+        } else {
+            $user->likedVideos()->attach($video->id);
+            return response()->json(['message' => 'Like agregado.']);
+        }
+    }
+
 }

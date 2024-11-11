@@ -23,6 +23,15 @@
                 <button id="markAsWatchedBtn" class="btn btn-primary" onclick="markAsWatched()">Marcar como visto</button>
             @endif
 
+            <!-- Sección de Like -->
+            @if(auth()->user()->isUser())
+                <button id="likeBtn" class="btn btn-primary mt-2" onclick="toggleLike()">
+                    {{ auth()->user()->likedVideos->contains($video->id) ? 'Quitar Like' : 'Dar Like' }}
+                </button>
+            @endif
+
+            <p class="mt-3">Total de likes: {{ $video->likes->count() }}</p>
+
             <!-- Mostrar comentarios aprobados o desaprobados -->
             <h3 style="margin-top: 2rem; font-size: 1.25rem; font-weight: 600;">Comentarios</h3>
             <ul class="list-group">
@@ -102,26 +111,36 @@
         });
     }
 
-    function toggleApproval(commentId) {
-    fetch(`/comments/${commentId}/toggle-approval`, {
-        method: 'PATCH',
-        headers: {
-            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => {
-        
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.json();
-    })
-    .then(data => {
-        alert(data.message);
-    })
-    .catch(error => console.error('Error al actualizar el estado de aprobación:', error));
-}
+    function toggleLike() {
+        fetch(`/videos/{{ $video->id }}/toggle-like`, {
+            method: 'PATCH',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            // Opcional: refrescar la página o actualizar el botón de like
+            location.reload(); // Actualiza la página para reflejar el cambio de estado del like
+        })
+        .catch(error => console.error('Error al dar/quitarlike:', error));
+    }
 
+    function toggleApproval(commentId) {
+        fetch(`/comments/${commentId}/toggle-approval`, {
+            method: 'PATCH',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+        })
+        .catch(error => console.error('Error al actualizar el estado de aprobación:', error));
+    }
 </script>
 @endsection
