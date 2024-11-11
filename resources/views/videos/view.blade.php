@@ -16,7 +16,7 @@
             </div>
 
             <p style="margin-top: 1rem; color: #6B7280;">Duración del video: {{ $video->minutes }} minutos</p>
-            <p style="margin-top: 0.5rem; color: #6B7280;">Progreso del curso: {{ round($progressPercentage, 2) }}%</p>
+            <p style="margin-top: 0.5rem; color: #6B7280;">Progreso del curso: <span id="progressPercentage">{{ round($progressPercentage, 2) }}%</span></p>
 
             @if(auth()->user()->isUser())
                 <!-- Botón para marcar el video como visto -->
@@ -104,12 +104,16 @@
             } else {
                 alert("¡Progreso actualizado!");
             }
+            // Recarga la página para reflejar el cambio
+            location.reload();
         })
         .catch(error => {
             console.error('Error al registrar progreso:', error);
             alert('Hubo un problema al actualizar el progreso.');
         });
     }
+
+
 
     function toggleLike() {
         fetch(`/videos/{{ $video->id }}/toggle-like`, {

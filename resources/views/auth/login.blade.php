@@ -1,4 +1,3 @@
-<!-- resources/views/auth/login.blade.php -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -38,6 +37,13 @@
 
             <button type="submit" class="w-full bg-blue-500 text-white p-3 rounded">Iniciar sesión</button>
         </form>
+
+        <!-- Agregar un enlace de registro debajo del botón de inicio de sesión -->
+        <div class="mt-6 text-center">
+            <p>¿No tienes una cuenta? 
+                <a href="{{ route('register') }}" class="text-blue-500 hover:underline">Regístrate aquí</a>
+            </p>
+        </div>
     </div>
 </div>
 

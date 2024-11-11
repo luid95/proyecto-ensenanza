@@ -17,7 +17,7 @@ class VideoSeeder extends Seeder
             'title' => 'Introducción a las Fracciones',
             'url' => 'https://www.youtube.com/watch?v=example',
             'course_id' => 1,
-            'category_id' => 1,
+            //'category_id' => 1,
         ]);
     }
 }
