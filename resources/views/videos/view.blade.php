@@ -18,8 +18,46 @@
             <p style="margin-top: 1rem; color: #6B7280;">Duración del video: {{ $video->minutes }} minutos</p>
             <p style="margin-top: 0.5rem; color: #6B7280;">Progreso del curso: {{ round($progressPercentage, 2) }}%</p>
 
-            <!-- Botón para marcar el video como visto -->
-            <button id="markAsWatchedBtn" class="btn btn-primary" onclick="markAsWatched()">Marcar como visto</button>
+            @if(auth()->user()->isUser())
+                <!-- Botón para marcar el video como visto -->
+                <button id="markAsWatchedBtn" class="btn btn-primary" onclick="markAsWatched()">Marcar como visto</button>
+            @endif
+
+            <!-- Mostrar comentarios aprobados o desaprobados -->
+            <h3 style="margin-top: 2rem; font-size: 1.25rem; font-weight: 600;">Comentarios</h3>
+            <ul class="list-group">
+                @foreach($video->comments as $comment)
+                    @if($comment->approved || auth()->user()->isAdmin())
+                        <li class="list-group-item">
+                            <strong>{{ $comment->user->name }}:</strong> {{ $comment->content }}
+                            
+                            @if(auth()->user()->isAdmin())
+                                <!-- Switch para aprobar o desaprobar el comentario -->
+                                <div class="form-check form-switch float-end ms-2">
+                                    <input 
+                                        class="form-check-input" 
+                                        type="checkbox" 
+                                        id="approvalSwitch{{ $comment->id }}" 
+                                        onchange="toggleApproval({{ $comment->id }})"
+                                        {{ $comment->approved ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="approvalSwitch{{ $comment->id }}">Mostrar</label>
+                                </div>
+                            @endif
+                        </li>
+                    @endif
+                @endforeach
+            </ul>
+
+            @if(auth()->user()->isUser())
+                <!-- Formulario para dejar un comentario, después del botón -->
+                <h3 style="margin-top: 2rem; font-size: 1.25rem; font-weight: 600;">Deja tu comentario</h3>
+                <form action="{{ route('comments.store', $video->id) }}" method="POST">
+                    @csrf
+                    <textarea name="content" rows="4" class="form-control" placeholder="Escribe tu comentario aquí..." required></textarea>
+                    <button type="submit" class="btn btn-primary mt-2">Enviar comentario</button>
+                </form>
+            @endif
+            
         </div>
 
         <!-- Columna secundaria para listar los videos -->
@@ -50,11 +88,10 @@
                 'Content-Type': 'application/json'
             }
         })
-        .then(response => response.json())  // Cambia a .json() para procesar la respuesta como JSON
+        .then(response => response.json())
         .then(data => {
-            console.log(data);
             if (data.message) {
-                alert(data.message); // Mostrar el mensaje que viene del servidor
+                alert(data.message);
             } else {
                 alert("¡Progreso actualizado!");
             }
@@ -64,6 +101,27 @@
             alert('Hubo un problema al actualizar el progreso.');
         });
     }
-</script>
 
+    function toggleApproval(commentId) {
+    fetch(`/comments/${commentId}/toggle-approval`, {
+        method: 'PATCH',
+        headers: {
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        alert(data.message);
+    })
+    .catch(error => console.error('Error al actualizar el estado de aprobación:', error));
+}
+
+</script>
 @endsection

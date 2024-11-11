@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Web;
 use App\Models\Video;
 use App\Models\Course;
 use App\Models\CourseUser;
+use App\Models\Comment;
 use App\Models\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -108,6 +109,22 @@ class VideoController extends Controller
             return response()->json(['message' => 'Progreso actualizado.']);
         }
 
+    }
+
+    public function storeComment(Request $request, $videoId)
+    {
+        $request->validate([
+            'content' => 'required|string|max:1000',
+        ]);
+
+        $comment = Comment::create([
+            'user_id' => Auth::id(),
+            'video_id' => $videoId,
+            'content' => $request->content,
+            'approved' => 1, // Por defecto aprobado
+        ]);
+
+        return back()->with('message', 'Comentario enviado y esperando aprobación');
     }
 
 }

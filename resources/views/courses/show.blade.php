@@ -51,6 +51,11 @@
                                style="background-color: #34D399; color: white; padding: 0.5rem 1rem; border-radius: 0.375rem; display: inline-block; margin-top: 1rem;">
                                 Ver Video
                             </a>
+                        @elseif(auth()->user()->role == 'admin')
+                            <a href="{{ route('videos.view', ['video' => $video->id]) }}" 
+                               style="background-color: #34D399; color: white; padding: 0.5rem 1rem; border-radius: 0.375rem; display: inline-block; margin-top: 1rem;">
+                                Ver Detalle Video
+                            </a>
                         @endif
                     </div>
                 @endforeach

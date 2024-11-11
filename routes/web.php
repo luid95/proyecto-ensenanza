@@ -38,7 +38,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('courses/{course}/videos/create', [VideoController::class, 'create'])->name('videos.create');
     Route::get('/videos/{video}', [VideoController::class, 'index'])->name('videos.view');
     Route::post('mark-video-as-watched/{video_id}/{course_id}', [VideoController::class, 'markAsWatched']);
+    Route::post('/video/{videoId}/comment', [VideoController::class, 'storeComment'])->name('comments.store');
 
+    Route::patch('/comments/{id}/toggle-approval', [CommentController::class, 'toggleApproval'])->name('comments.toggleApproval');
 
 });
 
