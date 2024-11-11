@@ -6,9 +6,8 @@ use App\Http\Controllers\Web\CategoryController;
 use App\Http\Controllers\Web\CourseController;
 use App\Http\Controllers\Web\VideoController;
 use App\Http\Controllers\Web\CommentController;
+use App\Http\Controllers\Web\CourseUserController;
 use App\Http\Controllers\AuthController;
-
-use App\Http\Controllers\CourseUserController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -33,11 +32,14 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('courses', CourseController::class);
     Route::resource('videos', VideoController::class);
     Route::resource('comments', CommentController::class);
-    Route::resource('courses/progress', CourseUserController::class);
+    Route::resource('course-users', CourseUserController::class);
 
-     // Ruta específica para crear un video en un curso con course_id
-     Route::get('courses/{course}/videos/create', [VideoController::class, 'create'])->name('videos.create');
-     Route::get('/videos/{video}', [VideoController::class, 'index'])->name('videos.view');
+    // Ruta específica para crear un video en un curso con course_id
+    Route::get('courses/{course}/videos/create', [VideoController::class, 'create'])->name('videos.create');
+    Route::get('/videos/{video}', [VideoController::class, 'index'])->name('videos.view');
+    Route::post('mark-video-as-watched/{video_id}/{course_id}', [VideoController::class, 'markAsWatched']);
+
+
 });
 
 // Ruta de inicio (redirige a la vista 'home' si está autenticado)

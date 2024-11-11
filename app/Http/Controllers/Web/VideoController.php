@@ -4,8 +4,11 @@ namespace App\Http\Controllers\Web;
 
 use App\Models\Video;
 use App\Models\Course;
+use App\Models\CourseUser;
+use App\Models\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class VideoController extends Controller
 {
@@ -13,9 +16,37 @@ class VideoController extends Controller
     {
         // Obtener el video a partir del ID
         $video = Video::findOrFail($videoId);
+        $course = $video->course;
+
+        // Obtener el progreso del usuario en el curso
+        $courseUser = CourseUser::where('user_id', Auth::id())
+        ->where('course_id', $course->id)
+        ->first();
+        
+        // Si no hay progreso para el curso y el usuario, se establece en 0
+        if (!$courseUser) {
+            $progress = 0;
+        } else {
+            // Obtener todos los videos del curso y los registros de progreso para este curso y usuario
+            $progress = CourseUser::where('user_id', Auth::id())
+                                ->where('course_id', $course->id)
+                                ->sum('progress'); // Sumar todos los minutos de los videos vistos por el usuario
+        }
+
+        // Obtener los videos vistos por el usuario en este curso
+        $watchedVideos = CourseUser::where('user_id', Auth::id())
+        ->where('course_id', $course->id)
+        ->pluck('current_video_id')
+        ->toArray();
+
+        // Calcular el progreso total del curso
+        $totalMinutes = $course->videos->sum('minutes');
+
+        // Calcular el porcentaje de progreso
+        $progressPercentage = $totalMinutes > 0 ? ($progress / $totalMinutes) * 100 : 0;
 
         // Retornar la vista para ver el video
-        return view('videos.view', compact('video'));
+        return view('videos.view', compact('video', 'course', 'progressPercentage', 'progress',  'watchedVideos'));
     }
 
     public function create($course_id)
@@ -50,4 +81,33 @@ class VideoController extends Controller
 
         return redirect()->route('courses.show', $course->id)->with('success', 'Video creado con éxito');
     }
+
+    public function markAsWatched($videoId, $courseId)
+    {
+        $user = auth()->user(); // Obtener el usuario autenticado
+        
+        // Verificar si el video y el curso existen
+        $video = Video::findOrFail($videoId);
+        $course = $video->course;
+
+        // Verificar si el usuario está inscrito en el curso
+        $courseUser = CourseUser::where('course_id', $courseId)
+                                ->where('user_id', $user->id)
+                                ->where('current_video_id', $video->id)
+                                ->first();
+        if (!$courseUser) {
+            // Si no existe, crea un nuevo progreso
+            $new_reg = CourseUser::create([
+                'user_id' => $user->id,
+                'course_id' => $course->id,
+                'current_video_id' => $video->id,
+                'progress' => $video->minutes
+            ]);
+            $new_reg->save();
+
+            return response()->json(['message' => 'Progreso actualizado.']);
+        }
+
+    }
+
 }

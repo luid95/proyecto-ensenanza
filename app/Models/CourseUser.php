@@ -20,9 +20,13 @@ class CourseUser extends Model
     {
         return $this->belongsTo(Course::class);
     }
+    
+    public function courses()
+    {
+        return $this->belongsToMany(Course::class, 'course_user')->withPivot('progress');
+    }
 
-    // Relación con el video
-    public function video()
+    public function currentVideo()
     {
         return $this->belongsTo(Video::class, 'current_video_id');
     }
